@@ -1,17 +1,20 @@
+/* jshint esversion: 6 */
 require('dotenv').config();
 const restify = require('restify');
+const fs = require('fs');
 const builder = require('botbuilder');
 const ticketsApi = require('./ticketsApi');
+
 const listenPort = process.env.port || process.env.PORT || 3978;
 const ticketSubmissionUrl = process.env.TICKET_SUBMISSION_URL || `http://localhost:${listenPort}`;
 
 // Setup Restify Server
-var server = restify.createServer();
-server.listen(listenPort, '::', () => {
-    console.log('Server Up');
+const server = restify.createServer();
+server.listen(listenPort, () => {
+    console.log('%s listening to %s', server.name, server.url);
 });
 
-// Setup body parser and tickets api
+// Setup body parser and sample tickets api
 server.use(restify.bodyParser());
 server.post('/api/tickets', ticketsApi);
 
@@ -24,7 +27,6 @@ var connector = new builder.ChatConnector({
 // Listen for messages from users
 server.post('/api/messages', connector.listen());
 
-// Receive messages from the user and respond by echoing each message back (prefixed with 'You said:')
 var bot = new builder.UniversalBot(connector, [
     (session, args, next) => {
         session.send('Hi! I\'m the help desk bot and I can help you create a ticket.');
@@ -45,7 +47,7 @@ var bot = new builder.UniversalBot(connector, [
         session.dialogData.category = result.response;
 
         var message = `Great! I'm going to create a "${session.dialogData.severity}" severity ticket in the "${session.dialogData.category}" category. ` +
-                  `The description I will use is "${session.dialogData.description}". Can you please confirm that this information is correct?`;
+                      `The description I will use is "${session.dialogData.description}". Can you please confirm that this information is correct?`;
 
         builder.Prompts.confirm(session, message, { listStyle: builder.ListStyle.button });
     },
@@ -77,7 +79,6 @@ var bot = new builder.UniversalBot(connector, [
         }
     }
 ]);
-
 
 const createCard = (ticketId, data) => {
     var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
