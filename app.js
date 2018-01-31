@@ -50,30 +50,26 @@ var bot = new builder.UniversalBot(connector, [
         builder.Prompts.confirm(session, message, { listStyle: builder.ListStyle.button });
     },
     (session, result, next) => {
-        if (result.response) {
-            session.send('Awesome! Your ticked has been created.');
-            session.endDialog();
-        } else {
-            session.endDialog('Ok. The ticket was not created. You can start again if you want.');
-        }
-    },
-    (session, result, next) => {
+
         if (result.response) {
             var data = {
                 category: session.dialogData.category,
                 severity: session.dialogData.severity,
                 description: session.dialogData.description,
-            }
-    
+            };
+
             const client = restify.createJsonClient({ url: ticketSubmissionUrl });
-    
+
             client.post('/api/tickets', data, (err, request, response, ticketId) => {
                 if (err || ticketId == -1) {
-                    session.send('Something went wrong while I was saving your ticket. Please try again later.')
+                    session.send('Ooops! Something went wrong while I was saving your ticket. Please try again later.');
                 } else {
-                    session.send(`Awesome! Your ticked has been created with the number ${ticketId}.`);
+                    session.send(new builder.Message(session).addAttachment({
+                        contentType: "application/vnd.microsoft.card.adaptive",
+                        content: createCard(ticketId, data)
+                    }));
                 }
-    
+
                 session.endDialog();
             });
         } else {
@@ -81,3 +77,15 @@ var bot = new builder.UniversalBot(connector, [
         }
     }
 ]);
+
+
+const createCard = (ticketId, data) => {
+    var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
+
+    cardTxt = cardTxt.replace(/{ticketId}/g, ticketId)
+                    .replace(/{severity}/g, data.severity)
+                    .replace(/{category}/g, data.category)
+                    .replace(/{description}/g, data.description);
+
+    return JSON.parse(cardTxt);
+};
