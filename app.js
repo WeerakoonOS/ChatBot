@@ -1,12 +1,19 @@
 require('dotenv').config();
 const restify = require('restify');
 const builder = require('botbuilder');
+const ticketsApi = require('./ticketsApi');
+const listenPort = process.env.port || process.env.PORT || 3978;
+const ticketSubmissionUrl = process.env.TICKET_SUBMISSION_URL || `http://localhost:${listenPort}`;
 
 // Setup Restify Server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 3978, () => {
-    console.log('%s listening to %s', server.name, server.url);
+server.listen(listenPort, '::', () => {
+    console.log('Server Up');
 });
+
+// Setup body parser and tickets api
+server.use(restify.bodyParser());
+server.post('/api/tickets', ticketsApi);
 
 // Create chat connector for communicating with the Bot Framework Service
 var connector = new builder.ChatConnector({
@@ -46,6 +53,29 @@ var bot = new builder.UniversalBot(connector, [
         if (result.response) {
             session.send('Awesome! Your ticked has been created.');
             session.endDialog();
+        } else {
+            session.endDialog('Ok. The ticket was not created. You can start again if you want.');
+        }
+    },
+    (session, result, next) => {
+        if (result.response) {
+            var data = {
+                category: session.dialogData.category,
+                severity: session.dialogData.severity,
+                description: session.dialogData.description,
+            }
+    
+            const client = restify.createJsonClient({ url: ticketSubmissionUrl });
+    
+            client.post('/api/tickets', data, (err, request, response, ticketId) => {
+                if (err || ticketId == -1) {
+                    session.send('Something went wrong while I was saving your ticket. Please try again later.')
+                } else {
+                    session.send(`Awesome! Your ticked has been created with the number ${ticketId}.`);
+                }
+    
+                session.endDialog();
+            });
         } else {
             session.endDialog('Ok. The ticket was not created. You can start again if you want.');
         }
