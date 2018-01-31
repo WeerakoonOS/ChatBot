@@ -67,7 +67,10 @@ var bot = new builder.UniversalBot(connector, [
                 if (err || ticketId == -1) {
                     session.send('Something went wrong while I was saving your ticket. Please try again later.')
                 } else {
-                    session.send(`Awesome! Your ticked has been created with the number ${ticketId}.`);
+                    session.send(new builder.Message(session).addAttachment({
+                        contentType: "application/vnd.microsoft.card.adaptive",
+                        content: createCard(ticketId, data)
+                    }));
                 }
     
                 session.endDialog();
@@ -78,7 +81,7 @@ var bot = new builder.UniversalBot(connector, [
     }
 ]);
 
-/* const createCard = (ticketId, data) => {
+const createCard = (ticketId, data) => {
     var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
 
     cardTxt = cardTxt.replace(/{ticketId}/g, ticketId)
@@ -87,4 +90,4 @@ var bot = new builder.UniversalBot(connector, [
                     .replace(/{description}/g, data.description);
 
     return JSON.parse(cardTxt);
-}; */
+};
