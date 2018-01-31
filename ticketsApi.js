@@ -1,3 +1,4 @@
+"use strict";
 var tickets = [];
 var lastTicketId = 1;
 

@@ -1,4 +1,5 @@
 /* jshint esversion: 6 */
+"use strict";
 require('dotenv').config();
 const restify = require('restify');
 const fs = require('fs');
@@ -52,26 +53,22 @@ var bot = new builder.UniversalBot(connector, [
         builder.Prompts.confirm(session, message, { listStyle: builder.ListStyle.button });
     },
     (session, result, next) => {
-
         if (result.response) {
             var data = {
                 category: session.dialogData.category,
                 severity: session.dialogData.severity,
                 description: session.dialogData.description,
-            };
-
+            }
+    
             const client = restify.createJsonClient({ url: ticketSubmissionUrl });
-
+    
             client.post('/api/tickets', data, (err, request, response, ticketId) => {
                 if (err || ticketId == -1) {
-                    session.send('Ooops! Something went wrong while I was saving your ticket. Please try again later.');
+                    session.send('Something went wrong while I was saving your ticket. Please try again later.')
                 } else {
-                    session.send(new builder.Message(session).addAttachment({
-                        contentType: "application/vnd.microsoft.card.adaptive",
-                        content: createCard(ticketId, data)
-                    }));
+                    session.send(`Awesome! Your ticked has been created with the number ${ticketId}.`);
                 }
-
+    
                 session.endDialog();
             });
         } else {
@@ -80,7 +77,7 @@ var bot = new builder.UniversalBot(connector, [
     }
 ]);
 
-const createCard = (ticketId, data) => {
+/* const createCard = (ticketId, data) => {
     var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
 
     cardTxt = cardTxt.replace(/{ticketId}/g, ticketId)
@@ -89,4 +86,4 @@ const createCard = (ticketId, data) => {
                     .replace(/{description}/g, data.description);
 
     return JSON.parse(cardTxt);
-};
+}; */
