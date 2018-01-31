@@ -28,6 +28,6 @@ var bot = new builder.UniversalBot(connector, [
         session.send(`Got it. Your problem is "${session.dialogData.description}"`);
         session.endDialog();
     }
-]);
+]
 
 );
