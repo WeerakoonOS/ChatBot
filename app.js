@@ -30,6 +30,7 @@ server.post('/api/messages', connector.listen());
 
 var bot = new builder.UniversalBot(connector, [
     (session, args, next) => {
+        session.sendTyping();
         session.send('Hi! I\'m the help desk bot and I can help you create a ticket.');
         builder.Prompts.text(session, 'First, please briefly describe your problem to me.');
     },
@@ -53,6 +54,7 @@ var bot = new builder.UniversalBot(connector, [
         builder.Prompts.confirm(session, message, { listStyle: builder.ListStyle.button });
     },
     (session, result, next) => {
+        session.sendTyping();// send 'typing' to user
         if (result.response) {
             var data = {
                 category: session.dialogData.category,
@@ -67,6 +69,7 @@ var bot = new builder.UniversalBot(connector, [
                     session.send('Something went wrong while I was saving your ticket. Please try again later.')
                 } else {
                     session.send(new builder.Message(session).addAttachment({
+                        
                         contentType: "application/vnd.microsoft.card.adaptive",
                         content: createCard(ticketId, data)
                     }));
