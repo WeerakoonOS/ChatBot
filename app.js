@@ -65,7 +65,7 @@ var bot = new builder.UniversalBot(connector, [
             const client = restify.createJsonClient({ url: ticketSubmissionUrl });
     
             client.post('/api/tickets', data, (err, request, response, ticketId) => {
-                if (err || ticketId == -1) {
+                if (err || ticketId == -1) { 
                     session.send('Something went wrong while I was saving your ticket. Please try again later.')
                 } else {
                     session.send(new builder.Message(session).addAttachment({
