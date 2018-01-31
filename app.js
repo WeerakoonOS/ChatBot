@@ -25,9 +25,29 @@ var bot = new builder.UniversalBot(connector, [
     },
     (session, result, next) => {
         session.dialogData.description = result.response;
-        session.send(`Got it. Your problem is "${session.dialogData.description}"`);
-        session.endDialog();
-    }
-]
 
-);
+        var choices = ['high', 'normal', 'low'];
+        builder.Prompts.choice(session, 'Which is the severity of this problem?', choices, { listStyle: builder.ListStyle.button });
+    },
+    (session, result, next) => {
+        session.dialogData.severity = result.response.entity;
+
+        builder.Prompts.text(session, 'Which would be the category for this ticket (software, hardware, networking, security or other)?');
+    },
+    (session, result, next) => {
+        session.dialogData.category = result.response;
+
+        var message = `Great! I'm going to create a "${session.dialogData.severity}" severity ticket in the "${session.dialogData.category}" category. ` +
+                  `The description I will use is "${session.dialogData.description}". Can you please confirm that this information is correct?`;
+
+        builder.Prompts.confirm(session, message, { listStyle: builder.ListStyle.button });
+    },
+    (session, result, next) => {
+        if (result.response) {
+            session.send('Awesome! Your ticked has been created.');
+            session.endDialog();
+        } else {
+            session.endDialog('Ok. The ticket was not created. You can start again if you want.');
+        }
+    }
+]);
