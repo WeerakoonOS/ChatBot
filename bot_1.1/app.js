@@ -50,8 +50,8 @@ bot.dialog('Help',
 
 bot.dialog('SubmitTicket', [
     (session, args, next) => {
-        var category = builder.EntityRecognizer.findEntity(args.intent.entities, 'category');
-        var severity = builder.EntityRecognizer.findEntity(args.intent.entities, 'severity');
+        var category = builder.EntityRecognizer.findEntity(args.intent.entities, 'Category');
+        var severity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Severity');
 
         if (category && category.resolution.values.length > 0) {
             session.dialogData.category = category.resolution.values[0];
