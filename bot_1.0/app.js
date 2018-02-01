@@ -34,7 +34,7 @@ var bot = new builder.UniversalBot(connector, [
         session.send('Hi! I\'m the help desk bot and I can help you create a ticket.');
         builder.Prompts.text(session, 'First, please briefly describe your problem to me.');
     },
-    (session, result, next) => {
+    (session, result, next) => { 
         session.dialogData.description = result.response;
 
         var choices = ['high', 'normal', 'low'];
