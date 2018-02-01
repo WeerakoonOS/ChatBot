@@ -1,4 +1,5 @@
 /* jshint esversion: 6 */
+"use strict";
 require('dotenv').config();
 const restify = require('restify');
 const fs = require('fs');
