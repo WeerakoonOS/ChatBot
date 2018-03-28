@@ -128,6 +128,17 @@ bot.dialog('SubmitTicket', [
     matches: 'SubmitTicket'
 });
 
+const createCard = (ticketId, data) => {
+    var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
+
+    cardTxt = cardTxt.replace(/{ticketId}/g, ticketId)
+                    .replace(/{severity}/g, data.severity)
+                    .replace(/{category}/g, data.category)
+                    .replace(/{description}/g, data.description);
+
+    return JSON.parse(cardTxt);
+};
+
 bot.dialog('ExploreKnowledgeBase', [
     (session, args) => {
         var category = builder.EntityRecognizer.findEntity(args.intent.entities, 'category');
@@ -151,14 +162,3 @@ bot.dialog('ExploreKnowledgeBase', [
 ]).triggerAction({
     matches: 'ExploreKnowledgeBase'
 });
-
-const createCard = (ticketId, data) => {
-    var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
-
-    cardTxt = cardTxt.replace(/{ticketId}/g, ticketId)
-                    .replace(/{severity}/g, data.severity)
-                    .replace(/{category}/g, data.category)
-                    .replace(/{description}/g, data.description);
-
-    return JSON.parse(cardTxt);
-};
