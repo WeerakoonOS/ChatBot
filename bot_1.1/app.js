@@ -5,11 +5,10 @@ const restify = require('restify');
 const fs = require('fs');
 const builder = require('botbuilder');
 const ticketsApi = require('./ticketsApi');
+const azureSearch = require('./azureSearchApiClient');
 
 const listenPort = process.env.port || process.env.PORT || 3978;
 const ticketSubmissionUrl = process.env.TICKET_SUBMISSION_URL || `http://localhost:${listenPort}`;
-
-const azureSearch = require('./azureSearchApiClient');
 
 const azureSearchQuery = azureSearch({
     searchName: process.env.AZURE_SEARCH_ACCOUNT,
