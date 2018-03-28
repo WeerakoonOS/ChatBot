@@ -129,6 +129,30 @@ bot.dialog('SubmitTicket', [
     matches: 'SubmitTicket'
 });
 
+bot.dialog('ExploreKnowledgeBase', [
+    (session, args) => {
+        var category = builder.EntityRecognizer.findEntity(args.intent.entities, 'category');
+        if (!category) {
+            return session.endDialog('Try typing something like _explore hardware_.');
+        }
+        // search by category
+        azureSearchQuery('$filter=' + encodeURIComponent(`category eq '${category.entity}'`), (error, result) => {
+            if (error) {
+                console.log(error);
+                session.endDialog('Ooops! Something went wrong while contacting Azure Search. Please try again later.');
+            } else {
+                var msg = `These are some articles I\'ve found in the knowledge base for the _'${category.entity}'_ category:`;
+                result.value.forEach((article) => {
+                    msg += `\n * ${article.title}`;
+                });
+                session.endDialog(msg);
+            }
+        });
+    }
+]).triggerAction({
+    matches: 'ExploreKnowledgeBase'
+});
+
 const createCard = (ticketId, data) => {
     var cardTxt = fs.readFileSync('./cards/ticket.json', 'UTF-8');
 
