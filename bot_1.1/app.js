@@ -1,4 +1,12 @@
 /* jshint esversion: 6 */
+const azureSearch = require('./azureSearchApiClient');
+
+const azureSearchQuery = azureSearch({
+    searchName: process.env.AZURE_SEARCH_ACCOUNT,
+    indexName: process.env.AZURE_SEARCH_INDEX,
+    searchKey: process.env.AZURE_SEARCH_KEY
+});
+
 "use strict";
 require('dotenv').config();
 const restify = require('restify');
