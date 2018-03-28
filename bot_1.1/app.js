@@ -1,12 +1,4 @@
 /* jshint esversion: 6 */
-const azureSearch = require('./azureSearchApiClient');
-
-const azureSearchQuery = azureSearch({
-    searchName: process.env.AZURE_SEARCH_ACCOUNT,
-    indexName: process.env.AZURE_SEARCH_INDEX,
-    searchKey: process.env.AZURE_SEARCH_KEY
-});
-
 "use strict";
 require('dotenv').config();
 const restify = require('restify');
@@ -16,6 +8,14 @@ const ticketsApi = require('./ticketsApi');
 
 const listenPort = process.env.port || process.env.PORT || 3978;
 const ticketSubmissionUrl = process.env.TICKET_SUBMISSION_URL || `http://localhost:${listenPort}`;
+
+const azureSearch = require('./azureSearchApiClient');
+
+const azureSearchQuery = azureSearch({
+    searchName: process.env.AZURE_SEARCH_ACCOUNT,
+    indexName: process.env.AZURE_SEARCH_INDEX,
+    searchKey: process.env.AZURE_SEARCH_KEY
+});
 
 // Setup Restify Server
 const server = restify.createServer();
